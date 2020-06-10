@@ -1,6 +1,34 @@
 void changePlayMode(){
   int DSD = digitalRead(DP);
 
+  if (DSD64 == 0x42) {
+    bitWrite(ak449Chip0.Dsd1, 0, 1);
+    bitWrite(ak449Chip0.Dsd2, 0, 1);
+    bitWrite(ak449Chip1.Dsd1, 0, 1);
+    bitWrite(ak449Chip1.Dsd2, 0, 1);
+  } else if (DSD64 == 0x40) {
+    bitWrite(ak449Chip0.Dsd1, 0, 0);
+    bitWrite(ak449Chip0.Dsd2, 0, 1);
+    bitWrite(ak449Chip1.Dsd1, 0, 0);
+    bitWrite(ak449Chip1.Dsd2, 0, 1);
+  } else if (DSD64 == 0x02) {
+    bitWrite(ak449Chip0.Dsd1, 0, 1);
+    bitWrite(ak449Chip0.Dsd2, 0, 0);
+    bitWrite(ak449Chip1.Dsd1, 0, 1);
+    bitWrite(ak449Chip1.Dsd2, 0, 0);
+  } else if (DSD64 == 0x00) {
+    bitWrite(ak449Chip0.Dsd1, 0, 0);
+    bitWrite(ak449Chip0.Dsd2, 0, 0);
+    bitWrite(ak449Chip1.Dsd1, 0, 0);
+    bitWrite(ak449Chip1.Dsd2, 0, 0);
+  }
+  i2cWrite(AK449_Chip0, 0x06, ak449Chip0.Dsd1);
+  i2cWrite(AK449_Chip0, 0x09, ak449Chip0.Dsd2);
+  if (mono == 0x80) {
+    i2cWrite(AK449_Chip1, 0x06, ak449Chip0.Dsd1);
+    i2cWrite(AK449_Chip1, 0x09, ak449Chip0.Dsd2);
+  }
+
   if ( (prevMode == 1) && (DSD == 0)  ) {   // PCM mode
     bitWrite(ak449Chip0.Ctrl2, 0, 1); 
     i2cWrite(AK449_Chip0, 0x01, ak449Chip0.Ctrl2);  // Soft mute ON
