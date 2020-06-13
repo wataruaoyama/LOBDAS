@@ -66,9 +66,9 @@ void setup() {
   delay(1000);  // Wait 1 second for reset CPLD
   initRegister();
   initDisplay();
-  readAK449Chip1Register();  
+//  readAK449Chip1Register();  
   digitalWrite(pwLED,HIGH);
-  ledbit = 1;
+//  ledbit = 1;
 //  delay(2000);
 }
 

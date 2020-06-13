@@ -8,47 +8,47 @@ void initAK449() {
   
   mono = cpld.deviceConfig0 & 0xC0;
   deviceName = cpld.hwConfig & 0x07;
-  regData = cpld.deviceConfig0 & 0x38;
+  DIF = cpld.deviceConfig0 & 0x38;
 
   // Audio Data Interface modes
   // Default is 32bit I2S intercace
-  if (regData == 0x38) {      // DIF=0x0E
+  if (DIF == 0x38) {      // DIF=0x0E
     ak449Chip0.Ctrl1 = 0x8F; 
     ak449Chip1.Ctrl1 = 0x8F;    
   }
-  else if (regData == 0x30) { // DIF=0x0C  
+  else if (DIF == 0x30) { // DIF=0x0C  
     ak449Chip0.Ctrl1 = 0x8D; 
     ak449Chip1.Ctrl1 = 0x8D;   
   }
-  else if (regData == 0x28) { // DIF=0x0A
+  else if (DIF == 0x28) { // DIF=0x0A
     ak449Chip0.Ctrl1 = 0x8B; 
     ak449Chip1.Ctrl1 = 0x88;   
   }
-  else if (regData== 0x20) {  // DIF=0x08
+  else if (DIF == 0x20) {  // DIF=0x08
     ak449Chip0.Ctrl1 = 0x89; 
     ak449Chip1.Ctrl1 = 0x89;    
   }
-  else if (regData == 0x18) { // DIF= 0x06
+  else if (DIF == 0x18) { // DIF= 0x06
     ak449Chip0.Ctrl1 = 0x87; 
     ak449Chip1.Ctrl1 = 0x87;    
   }
-  else if (regData == 0x10) { // DIF=0x04
+  else if (DIF == 0x10) { // DIF=0x04
     ak449Chip0.Ctrl1 = 0x85; 
     ak449Chip1.Ctrl1 = 0x85;    
   }
-  else if (regData == 0x08) { // DIF=0x02
+  else if (DIF == 0x08) { // DIF=0x02
     ak449Chip0.Ctrl1 = 0x83; 
     ak449Chip1.Ctrl1 = 0x83;    
   }
-  else if (regData == 0x00) { // DIF=0x00
+  else if (DIF == 0x00) { // DIF=0x00
     ak449Chip0.Ctrl1 = 0x81; 
     ak449Chip1.Ctrl1 = 0x81;    
   }
 
   // De-emphasis Filter Control
   // Defult is De-emphases off
-  regData = cpld.deviceConfig1 & 0x10;
-  if (regData == 0x10) {  // De-emphasis off
+  DEM = cpld.deviceConfig1 & 0x10;
+  if (DEM == 0x10) {  // De-emphasis off
     ak449Chip0.Ctrl2 = 0x22; 
     ak449Chip0.Ctrl6 = 0x01;
     ak449Chip1.Ctrl2 = 0x22;
@@ -90,9 +90,9 @@ void initAK449() {
     }
   }
 
-  regData = cpld.deviceConfig1 & 0x01;
+  DSDF = cpld.deviceConfig1 & 0x01;
   // DSDF: Internal DSD filter setting
-  if (regData == 0x01) {  // Internal DSD Filter Cut OFF Freq. is Low
+  if (DSDF == 0x01) {  // Internal DSD Filter Cut OFF Freq. is Low
     bitWrite(ak449Chip0.Dsd2, 1, 0);
     bitWrite(ak449Chip1.Dsd2, 1, 0);
   }
@@ -116,19 +116,19 @@ void initAK449() {
   bitWrite(ak449Chip1.Dsd1, 0, b);
   
   // DSDD: DSD playback path control
-  b = bitRead(cpld.deviceConfig1, 1);
-  bitWrite(ak449Chip0.Dsd1, 1, b);
-  bitWrite(ak449Chip1.Dsd1, 1, b);
+  DSDD = bitRead(cpld.deviceConfig1, 1);
+  bitWrite(ak449Chip0.Dsd1, 1, DSDD);
+  bitWrite(ak449Chip1.Dsd1, 1, DSDD);
 
   // Gain Control
   // GC[1]
-  b = bitRead(cpld.deviceConfig0, 1);
-  bitWrite(ak449Chip0.Ctrl5, 2, b);
-  bitWrite(ak449Chip1.Ctrl5, 2, b);
+  GC1 = bitRead(cpld.deviceConfig0, 1);
+  bitWrite(ak449Chip0.Ctrl5, 2, GC1);
+  bitWrite(ak449Chip1.Ctrl5, 2, GC1);
   // GC[0]
-  b = bitRead(cpld.deviceConfig0, 0);
-  bitWrite(ak449Chip0.Ctrl5, 1, b);
-  bitWrite(ak449Chip1.Ctrl5, 1, b);
+  GC0 = bitRead(cpld.deviceConfig0, 0);
+  bitWrite(ak449Chip0.Ctrl5, 1, GC0);
+  bitWrite(ak449Chip1.Ctrl5, 1, GC0);
 
   // SYNCE
   bitWrite(ak449Chip0.Ctrl5, 0, 1);

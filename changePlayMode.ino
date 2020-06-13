@@ -1,22 +1,22 @@
 void changePlayMode(){
   int DSD = digitalRead(DP);
 
-  if (DSD64 == 0x42) {
+  if (DSD64 == 0x42) {          // if DSD512
     bitWrite(ak449Chip0.Dsd1, 0, 1);
     bitWrite(ak449Chip0.Dsd2, 0, 1);
     bitWrite(ak449Chip1.Dsd1, 0, 1);
     bitWrite(ak449Chip1.Dsd2, 0, 1);
-  } else if (DSD64 == 0x40) {
+  } else if (DSD64 == 0x40) {   // if DSD256
     bitWrite(ak449Chip0.Dsd1, 0, 0);
     bitWrite(ak449Chip0.Dsd2, 0, 1);
     bitWrite(ak449Chip1.Dsd1, 0, 0);
     bitWrite(ak449Chip1.Dsd2, 0, 1);
-  } else if (DSD64 == 0x02) {
+  } else if (DSD64 == 0x02) {   // if DSD128
     bitWrite(ak449Chip0.Dsd1, 0, 1);
     bitWrite(ak449Chip0.Dsd2, 0, 0);
     bitWrite(ak449Chip1.Dsd1, 0, 1);
     bitWrite(ak449Chip1.Dsd2, 0, 0);
-  } else if (DSD64 == 0x00) {
+  } else if (DSD64 == 0x00) {   // if DSD64
     bitWrite(ak449Chip0.Dsd1, 0, 0);
     bitWrite(ak449Chip0.Dsd2, 0, 0);
     bitWrite(ak449Chip1.Dsd1, 0, 0);
