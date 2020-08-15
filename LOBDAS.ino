@@ -6,6 +6,24 @@
 #define SDA 21
 #define SCL 22
 
+/* Comment this out to disable prints and save space */
+#define BLYNK_PRINT Serial
+
+
+#include <WiFi.h>
+#include <WiFiClient.h>
+#include <BlynkSimpleEsp32.h>
+
+// You should get Auth Token in the Blynk App.
+// Go to the Project Settings (nut icon).
+char auth[] = "YwFqVvbWkrJ4F6u_OuupV_kao_5BOrZC";
+
+// Your WiFi credentials.
+// Set password to "" for open networks.
+char ssid[] = "RT_AC88U";
+char pass[] = "wAs511957+rIc358224";
+
+
 int ledbit;
 
 SO2002A_I2C oled(0x3D);
@@ -67,12 +85,18 @@ void setup() {
   initRegister();
   initDisplay();
 //  readAK449Chip1Register();  
+
+  Blynk.begin(auth, ssid, pass);
+
   digitalWrite(pwLED,HIGH);
+  
 //  ledbit = 1;
 //  delay(2000);
 }
 
 void loop() {
+  Blynk.run();
+  
   // put your main code here, to run repeatedly:
   // Timer interrupt process
   if (timeCounter1 > 0) {
@@ -116,6 +140,70 @@ void loop() {
 //  readDeviceName();
   
   delay(10);
+}
+
+BLYNK_WRITE(V0){
+  volumeCounter = param[0].asInt();
+}
+
+BLYNK_WRITE(V1){
+  int blynkButton = param[0].asInt();
+  if ( blynkButton == 1) {
+    cnt++;
+    Serial.print("blynkButton = ");
+    Serial.println(blynkButton,DEC);
+    if ( cnt == 1 ) {
+      bitWrite(ak449Chip0.Ctrl3, 0, 0);
+      bitWrite(ak449Chip0.Ctrl2, 5, 0);
+      bitWrite(ak449Chip0.Ctrl4, 0, 0);
+      if ( mono == 0x80) {
+        bitWrite(ak449Chip1.Ctrl3, 0, 0);
+        bitWrite(ak449Chip1.Ctrl2, 5, 0);
+        bitWrite(ak449Chip1.Ctrl4, 0, 0);        
+      }
+    } else if (cnt == 2) {
+      bitWrite(ak449Chip0.Ctrl3, 0, 1);
+      if ( mono == 0x80) {
+        bitWrite(ak449Chip1.Ctrl3, 0, 1);       
+      }
+    } else if ( cnt == 3 ) {
+      bitWrite(ak449Chip0.Ctrl3, 0, 0);
+      bitWrite(ak449Chip0.Ctrl2, 5, 1);
+      if ( mono == 0x80 ) {
+        bitWrite(ak449Chip1.Ctrl3, 0, 0);
+        bitWrite(ak449Chip1.Ctrl2, 5, 1);        
+      }
+    } else if ( cnt == 4 ) {
+      bitWrite(ak449Chip0.Ctrl3, 0, 1);
+      if ( mono == 0x80 ) {
+        bitWrite(ak449Chip1.Ctrl3, 0, 1);        
+      }
+    } else if ( cnt == 5 ) {
+      bitWrite(ak449Chip0.Ctrl3, 0, 0);
+      bitWrite(ak449Chip0.Ctrl2, 5, 0);
+      bitWrite(ak449Chip0.Ctrl4, 0, 1);
+      if ( mono == 0x80 ) {
+        bitWrite(ak449Chip1.Ctrl3, 0, 0);
+        bitWrite(ak449Chip1.Ctrl2, 5, 0);
+        bitWrite(ak449Chip1.Ctrl4, 0, 1);        
+      }
+    } else if ( cnt == 6 ) {
+      bitWrite(ak449Chip0.Ctrl2, 5, 1);
+      if ( mono == 0x80 ) {
+        bitWrite(ak449Chip1.Ctrl2, 5, 1);
+      }
+      cnt = 0;
+    }
+  }
+  buttonState = state;
+  i2cWrite(AK449_Chip0, 0x01, ak449Chip0.Ctrl2);
+  i2cWrite(AK449_Chip0, 0x02, ak449Chip0.Ctrl3);
+  i2cWrite(AK449_Chip0, 0x05, ak449Chip0.Ctrl4);
+  if ( mono == 0x80 ) {
+    i2cWrite(AK449_Chip1, 0x01, ak449Chip1.Ctrl2);
+    i2cWrite(AK449_Chip1, 0x02, ak449Chip1.Ctrl3);
+    i2cWrite(AK449_Chip1, 0x05, ak449Chip1.Ctrl4);    
+  }
 }
 
 byte i2cRead(byte sladr, byte regadr){
