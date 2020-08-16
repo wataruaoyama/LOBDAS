@@ -21,7 +21,7 @@
 
 // You should get Auth Token in the Blynk App.
 // Go to the Project Settings (nut icon).
-char auth[] = "YwFqVvbWkrJ4F6u_OuupV_kao_5BOrZC";
+char auth[] = "Your Auth Token";
 
 // Your WiFi credentials.
 // Set password to "" for open networks.
@@ -204,7 +204,6 @@ BLYNK_WRITE(V1){
       cnt = 0;
     }
   }
-//  buttonState = state;
   i2cWrite(AK449_Chip0, 0x01, ak449Chip0.Ctrl2);
   i2cWrite(AK449_Chip0, 0x02, ak449Chip0.Ctrl3);
   i2cWrite(AK449_Chip0, 0x05, ak449Chip0.Ctrl4);
