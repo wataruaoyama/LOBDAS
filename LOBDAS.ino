@@ -1,3 +1,8 @@
+#include <BLEDevice.h>
+#include <BLEUtils.h>
+#include <BLEScan.h>
+#include <BLEAdvertisedDevice.h>
+
 #include <Wire.h>
 #include "SO2002A_I2C.h"
 #include <Preferences.h>
@@ -10,9 +15,9 @@
 #define BLYNK_PRINT Serial
 
 
-#include <WiFi.h>
-#include <WiFiClient.h>
-#include <BlynkSimpleEsp32.h>
+//#include <WiFi.h>
+//#include <WiFiClient.h>
+#include <BlynkSimpleEsp32_BLE.h>
 
 // You should get Auth Token in the Blynk App.
 // Go to the Project Settings (nut icon).
@@ -20,8 +25,8 @@ char auth[] = "YwFqVvbWkrJ4F6u_OuupV_kao_5BOrZC";
 
 // Your WiFi credentials.
 // Set password to "" for open networks.
-char ssid[] = "RT_AC88U";
-char pass[] = "wAs511957+rIc358224";
+//char ssid[] = "SSID;
+//char pass[] = "PASSWARD";
 
 
 int ledbit;
@@ -86,7 +91,8 @@ void setup() {
   initDisplay();
 //  readAK449Chip1Register();  
 
-  Blynk.begin(auth, ssid, pass);
+//  Blynk.begin(auth, ssid, pass);
+  Blynk.begin(auth);
 
   digitalWrite(pwLED,HIGH);
   
@@ -144,6 +150,9 @@ void loop() {
 
 BLYNK_WRITE(V0){
   volumeCounter = param[0].asInt();
+  unsigned char volume = volumeCounter;
+  volume = ~volume;
+  volumeCounter = volume;
 }
 
 BLYNK_WRITE(V1){
@@ -195,7 +204,7 @@ BLYNK_WRITE(V1){
       cnt = 0;
     }
   }
-  buttonState = state;
+//  buttonState = state;
   i2cWrite(AK449_Chip0, 0x01, ak449Chip0.Ctrl2);
   i2cWrite(AK449_Chip0, 0x02, ak449Chip0.Ctrl3);
   i2cWrite(AK449_Chip0, 0x05, ak449Chip0.Ctrl4);
@@ -203,6 +212,60 @@ BLYNK_WRITE(V1){
     i2cWrite(AK449_Chip1, 0x01, ak449Chip1.Ctrl2);
     i2cWrite(AK449_Chip1, 0x02, ak449Chip1.Ctrl3);
     i2cWrite(AK449_Chip1, 0x05, ak449Chip1.Ctrl4);    
+  }
+}
+
+BLYNK_WRITE(V2){
+  int blynkInsel = param.asInt();
+    if ( blynkInsel == 1) {
+    count++;
+    if ( count == 1 ) {
+      bitWrite(ak449Chip0.Ctrl2, 0, 1);
+      bitWrite(ak449Chip1.Ctrl2, 0, 1); 
+      i2cWrite(AK449_Chip0, 0x01, ak449Chip0.Ctrl2);  // Soft mute ON
+      if ( mono == 0x80 ) {
+        i2cWrite(AK449_Chip1, 0x01, ak449Chip1.Ctrl2);  // Soft mute ON
+      }      
+      i2cWrite(CPLD_ADR, 0x00, 0x00);     // Change Input to USB
+      bitWrite(ak449Chip0.Ctrl2, 0, 0);
+      bitWrite(ak449Chip1.Ctrl2, 0, 0);       
+      i2cWrite(AK449_Chip0, 0x01, ak449Chip0.Ctrl2);  // Soft mute OFF
+      if ( mono == 0x80 ) {
+        i2cWrite(AK449_Chip1, 0x01, ak449Chip1.Ctrl2);  // Soft mute OFF
+      }
+      Serial.println("USB INPUT Selected");
+    } else if (count == 2) {
+      bitWrite(ak449Chip0.Ctrl2, 0, 1); 
+      bitWrite(ak449Chip1.Ctrl2, 0, 1); 
+      i2cWrite(AK449_Chip0, 0x01, ak449Chip0.Ctrl2);  // Soft mute ON
+      if ( mono == 0x80 ) {
+        i2cWrite(AK449_Chip1, 0x01, ak449Chip1.Ctrl2);  // Soft mute ON
+      }
+      i2cWrite(CPLD_ADR, 0x00, 0x08);      // Change Inut to RJ45
+      bitWrite(ak449Chip0.Ctrl2, 0, 0); 
+      bitWrite(ak449Chip1.Ctrl2, 0, 0); 
+      i2cWrite(AK449_Chip0, 0x01, ak449Chip0.Ctrl2);  // Soft mute OFF
+      if ( mono == 0x80 ) {
+        i2cWrite(AK449_Chip1, 0x01, ak449Chip1.Ctrl2);  // Soft mute OFF
+      }
+      Serial.println("RJ45 INPUT Seleted");
+    } else if (count == 3) {
+      bitWrite(ak449Chip0.Ctrl2, 0, 1); 
+      bitWrite(ak449Chip1.Ctrl2, 0, 1); 
+      i2cWrite(AK449_Chip0, 0x01, ak449Chip0.Ctrl2);  // Soft mute ON
+      if ( mono == 0x80 ) {
+        i2cWrite(AK449_Chip1, 0x01, ak449Chip1.Ctrl2);  // Soft mute ON
+      }
+      i2cWrite(CPLD_ADR, 0x00, 0x10);      // Change Inut to RJ45
+      bitWrite(ak449Chip0.Ctrl2, 0, 0); 
+      bitWrite(ak449Chip1.Ctrl2, 0, 0); 
+      i2cWrite(AK449_Chip0, 0x01, ak449Chip0.Ctrl2);  // Soft mute OFF
+      if ( mono == 0x80 ) {
+        i2cWrite(AK449_Chip1, 0x01, ak449Chip1.Ctrl2);  // Soft mute OFF
+      }
+      count = 0;
+      Serial.println("XH INPUT Selected");
+    }
   }
 }
 
