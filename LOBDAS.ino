@@ -1,3 +1,8 @@
+#include <BLEDevice.h>
+#include <BLEUtils.h>
+#include <BLEScan.h>
+#include <BLEAdvertisedDevice.h>
+
 #include <Wire.h>
 #include "SO2002A_I2C.h"
 #include <Preferences.h>
@@ -10,18 +15,18 @@
 #define BLYNK_PRINT Serial
 
 
-#include <WiFi.h>
-#include <WiFiClient.h>
-#include <BlynkSimpleEsp32.h>
+//#include <WiFi.h>
+//#include <WiFiClient.h>
+#include <BlynkSimpleEsp32_BLE.h>
 
 // You should get Auth Token in the Blynk App.
 // Go to the Project Settings (nut icon).
-char auth[] = "YwFqVvbWkrJ4F6u_OuupV_kao_5BOrZC";
+char auth[] = "Auth Token";
 
 // Your WiFi credentials.
 // Set password to "" for open networks.
-char ssid[] = "RT_AC88U";
-char pass[] = "wAs511957+rIc358224";
+//char ssid[] = "SSID";
+//char pass[] = "PASSWARD";
 
 
 int ledbit;
@@ -86,7 +91,8 @@ void setup() {
   initDisplay();
 //  readAK449Chip1Register();  
 
-  Blynk.begin(auth, ssid, pass);
+//  Blynk.begin(auth, ssid, pass);
+  Blynk.begin(auth);
 
   digitalWrite(pwLED,HIGH);
   
@@ -144,6 +150,9 @@ void loop() {
 
 BLYNK_WRITE(V0){
   volumeCounter = param[0].asInt();
+  unsigned char volume = volumeCounter;
+  volume = ~volume;
+  volumeCounter = volume;
 }
 
 BLYNK_WRITE(V1){
@@ -195,7 +204,7 @@ BLYNK_WRITE(V1){
       cnt = 0;
     }
   }
-  buttonState = state;
+//  buttonState = state;
   i2cWrite(AK449_Chip0, 0x01, ak449Chip0.Ctrl2);
   i2cWrite(AK449_Chip0, 0x02, ak449Chip0.Ctrl3);
   i2cWrite(AK449_Chip0, 0x05, ak449Chip0.Ctrl4);
