@@ -21,13 +21,13 @@
 
 // You should get Auth Token in the Blynk App.
 // Go to the Project Settings (nut icon).
-char auth[] = "Your Auth Token";
+//char auth[] = "Your Auth Token";
+char auth[] = "YwFqVvbWkrJ4F6u_OuupV_kao_5BOrZC";
 
 // Your WiFi credentials.
 // Set password to "" for open networks.
 //char ssid[] = "SSID;
 //char pass[] = "PASSWARD";
-
 
 int ledbit;
 
@@ -89,15 +89,10 @@ void setup() {
   delay(1000);  // Wait 1 second for reset CPLD
   initRegister();
   initDisplay();
-//  readAK449Chip1Register();  
 
-//  Blynk.begin(auth, ssid, pass);
   Blynk.begin(auth);
 
   digitalWrite(pwLED,HIGH);
-  
-//  ledbit = 1;
-//  delay(2000);
 }
 
 void loop() {
@@ -134,16 +129,7 @@ void loop() {
 
   messageOut();
   changeFilter();
-//  playMode();   // Use external interrupt
   changePlayMode();
-//  if (ledbit == 1) {
-//    digitalWrite(pwLED,LOW);
-//  } else if (ledbit == 0) {
-//    digitalWrite(pwLED,HIGH);
-//  }
-//  ledbit = not ledbit;
-//  serialDebug();
-//  readDeviceName();
   
   delay(10);
 }
@@ -281,107 +267,4 @@ byte i2cWrite(byte sladr, byte regadr, byte wdata){
   Wire.write(regadr);
   Wire.write(wdata);
   Wire.endTransmission();
-}
-
-void serialDebug() {
-  Serial.print("Ctrl1 = 0x");
-  Serial.println(ak449Chip0.Ctrl1, HEX);
-  Serial.print("Ctrl2 = 0x");
-  Serial.println(ak449Chip0.Ctrl2, HEX);
-  Serial.print("Ctrl3 = 0x");
-  Serial.println(ak449Chip0.Ctrl3, HEX);
-  Serial.print("L1chATT = 0x");
-  Serial.println(ak449Chip0.L1chATT, HEX);
-  Serial.print("R1chATT = 0x");
-  Serial.println(ak449Chip0.R1chATT, HEX);
-  Serial.print("Ctrl4 = 0x");
-  Serial.println(ak449Chip0.Ctrl4, HEX);
-  Serial.print("Dsd1 = 0x");
-  Serial.println(ak449Chip0.Dsd1, HEX);
-  Serial.print("Ctrl5 = 0x");
-  Serial.println(ak449Chip0.Ctrl5, HEX);
-  Serial.print("Dsd2 = 0x");
-  Serial.println(ak449Chip0.Dsd2, HEX);
-  Serial.print("Ctrl6 = 0x");
-  Serial.println(ak449Chip0.Ctrl6, HEX);
-  Serial.print("Ctrl7 = 0x");
-  Serial.println(ak449Chip0.Ctrl7, HEX);
-  Serial.print("L2chATT = 0x");
-  Serial.println(ak449Chip0.L2chATT, HEX);
-  Serial.print("R2chATT = 0x");
-  Serial.println(ak449Chip0.R2chATT, HEX);
-  Serial.print("Ctrl8 = 0x");
-  Serial.println(ak449Chip0.Ctrl8, HEX);
-
-  if ( mono == 0x80 ) {
-    Serial.print("Ctrl1 = 0x");
-    Serial.println(ak449Chip1.Ctrl1, HEX);
-    Serial.print("Ctrl2 = 0x");
-    Serial.println(ak449Chip1.Ctrl2, HEX);
-    Serial.print("Ctrl3 = 0x");
-    Serial.println(ak449Chip1.Ctrl3, HEX);
-    Serial.print("L1chATT = 0x");
-    Serial.println(ak449Chip1.L1chATT, HEX);
-    Serial.print("R1chATT = 0x");
-    Serial.println(ak449Chip1.R1chATT, HEX);
-    Serial.print("Ctrl4 = 0x");
-    Serial.println(ak449Chip1.Ctrl4, HEX);
-    Serial.print("Dsd1 = 0x");
-    Serial.println(ak449Chip1.Dsd1, HEX);
-    Serial.print("Ctrl5 = 0x");
-    Serial.println(ak449Chip1.Ctrl5, HEX);
-    Serial.print("Dsd2 = 0x");
-    Serial.println(ak449Chip1.Dsd2, HEX);
-    Serial.print("Ctrl6 = 0x");
-    Serial.println(ak449Chip1.Ctrl6, HEX);
-    Serial.print("Ctrl7 = 0x");
-    Serial.println(ak449Chip1.Ctrl7, HEX);
-    Serial.print("L2chATT = 0x");
-    Serial.println(ak449Chip1.L2chATT, HEX);
-    Serial.print("R2chATT = 0x");
-    Serial.println(ak449Chip1.R2chATT, HEX);
-    Serial.print("Ctrl8 = 0x");
-    Serial.println(ak449Chip1.Ctrl8, HEX);
-  }
-  Serial.print("hwConfig = 0x");
-  Serial.println(cpld.hwConfig, HEX);
-  Serial.print("deviceConfig0 = 0x");
-  Serial.println(cpld.deviceConfig0, HEX);
-  Serial.print("deviceConfig1 = 0x");
-  Serial.println(cpld.deviceConfig1, HEX);   
-}
-
-void readAK449Chip1Register() {
-  byte Ctrl1 = i2cRead(AK449_Chip0, 0x00);
-  Serial.print("Ctrl1 of AK4499_Chip0 = 0x");
-  Serial.println(Ctrl1, HEX);
-  byte Ctrl2 = i2cRead(AK449_Chip0, 0x01);
-  Serial.print("Ctrl2 of AK4499_Chip0 = 0x");
-  Serial.println(Ctrl2, HEX);
-  byte Ctrl3 = i2cRead(AK449_Chip0, 0x02);
-  Serial.print("Ctrl3 of AK4499_Chip0 = 0x");
-  Serial.println(Ctrl3, HEX);
-  byte Ctrl4 = i2cRead(AK449_Chip0, 0x05);
-  Serial.print("Ctrl4 of AK4499_Chip0 = 0x");
-  Serial.println(Ctrl4, HEX);
-  byte Ctrl5 = i2cRead(AK449_Chip0, 0x07);
-  Serial.print("Ctrl5 of AK4499_Chip0 = 0x");
-  Serial.println(Ctrl5, HEX);
-  byte Ctrl6 = i2cRead(AK449_Chip0, 0x0A);
-  Serial.print("Ctrl6 of AK4499_Chip0 = 0x");
-  Serial.println(Ctrl6, HEX);
-  byte Ctrl7 = i2cRead(AK449_Chip0, 0x0B);
-  Serial.print("Ctrl7 of AK4499_Chip0 = 0x");
-  Serial.println(Ctrl7, HEX);
-  byte Ctrl8 = i2cRead(AK449_Chip0, 0x15);
-  Serial.print("Ctrl8 of AK4499_Chip0 = 0x");
-  Serial.println(Ctrl8, HEX);
-  byte L1chATT = i2cRead(AK449_Chip0, 0x03);
-  Serial.print("L1chATT of AK4499_Chip0 = 0x");
-  Serial.println(L1chATT, HEX);  
-}
-
-void readDeviceName() {
-  Serial.print("DeviceName = 0x");
-  Serial.println(deviceName);
 }

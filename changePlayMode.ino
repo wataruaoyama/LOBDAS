@@ -77,20 +77,6 @@ void changePlayMode(){
       i2cWrite(AK449_Chip1, 0x01, ak449Chip1.Ctrl2);  // Soft mute OFF
     }
     Serial.println("Internal Timing Reset by DSD");
-//  } else if ( (prevMode == 1) && (DSD == 1) ) {
-//      bitWrite(ak449Chip0.Ctrl3, 7, 1);
-//      i2cWrite(AK449_Chip0, 0x02, ak449Chip0.Ctrl3);  // Set "1" to DP bit
-//    if (mono == 0x80) {
-//        bitWrite(ak449Chip1.Ctrl3, 7, 1);
-//        i2cWrite(AK449_Chip1, 0x02, ak449Chip1.Ctrl3);  // Set "1" to DP bit
-//    }
-//  } else if ( (prevMode == 0) && (DSD == 0) ) {
-//      bitWrite(ak449Chip0.Ctrl3, 7, 0);
-//      i2cWrite(AK449_Chip0, 0x02, ak449Chip0.Ctrl3);  // Set "0" to DP bit
-//    if (mono == 0x80) {
-//        bitWrite(ak449Chip1.Ctrl3, 7, 0);
-//        i2cWrite(AK449_Chip1, 0x02, ak449Chip1.Ctrl3);  // Set "0" to DP bit
-//    }
   }
   prevMode = DSD;
 }
