@@ -2,6 +2,7 @@
 #include <BLEUtils.h>
 #include <BLEScan.h>
 #include <BLEAdvertisedDevice.h>
+#include <BlynkSimpleEsp32_BLE.h>
 
 #include <Wire.h>
 #include "SO2002A_I2C.h"
@@ -17,7 +18,7 @@
 
 //#include <WiFi.h>
 //#include <WiFiClient.h>
-#include <BlynkSimpleEsp32_BLE.h>
+//#include <BlynkSimpleEsp32.h>
 
 // You should get Auth Token in the Blynk App.
 // Go to the Project Settings (nut icon).
@@ -27,6 +28,8 @@ char auth[] = "Your Auth Token";
 // Set password to "" for open networks.
 //char ssid[] = "SSID;
 //char pass[] = "PASSWARD";
+
+WidgetLCD lcd(3);
 
 int ledbit;
 
@@ -88,9 +91,8 @@ void setup() {
   delay(1000);  // Wait 1 second for reset CPLD
   initRegister();
   initDisplay();
-
+//  Blynk.begin(auth, ssid, pass);
   Blynk.begin(auth);
-
   digitalWrite(pwLED,HIGH);
 }
 
@@ -125,8 +127,9 @@ void loop() {
 //    preferences.end();
   }
   preferences.end();
-
+  
   messageOut();
+  blynkDisplayOut();
   changeFilter();
   changePlayMode();
   
@@ -144,8 +147,6 @@ BLYNK_WRITE(V1){
   int blynkButton = param[0].asInt();
   if ( blynkButton == 1) {
     cnt++;
-    Serial.print("blynkButton = ");
-    Serial.println(blynkButton,DEC);
     if ( cnt == 1 ) {
       bitWrite(ak449Chip0.Ctrl3, 0, 0);
       bitWrite(ak449Chip0.Ctrl2, 5, 0);
@@ -251,6 +252,10 @@ BLYNK_WRITE(V2){
       Serial.println("XH INPUT Selected");
     }
   }
+}
+
+BLYNK_WRITE(V4){
+  blynkModeButton = param[0].asInt();
 }
 
 byte i2cRead(byte sladr, byte regadr){
