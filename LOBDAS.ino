@@ -23,6 +23,7 @@
 // You should get Auth Token in the Blynk App.
 // Go to the Project Settings (nut icon).
 char auth[] = "Your Auth Token";
+//char auth[] = "YwFqVvbWkrJ4F6u_OuupV_kao_5BOrZC";
 
 // Your WiFi credentials.
 // Set password to "" for open networks.
@@ -137,6 +138,17 @@ void loop() {
 }
 
 BLYNK_WRITE(V0){
+//  int vm = param[0].asInt();
+//  unsigned char volume;
+//  
+//  if ((vm < 1023) or (vm > 895)) {
+//    volume = vm>>2;
+//  } else if ( (vm < 894) or ( vm > 0)) {
+//    volume = vm;
+//  }
+//  volume = ~volume;
+//  volumeCounter = volume;
+  
   volumeCounter = param[0].asInt();
   unsigned char volume = volumeCounter;
   volume = ~volume;
