@@ -23,7 +23,6 @@
 // You should get Auth Token in the Blynk App.
 // Go to the Project Settings (nut icon).
 char auth[] = "Your Auth Token";
-//char auth[] = "YwFqVvbWkrJ4F6u_OuupV_kao_5BOrZC";
 
 // Your WiFi credentials.
 // Set password to "" for open networks.
@@ -31,8 +30,6 @@ char auth[] = "Your Auth Token";
 //char pass[] = "PASSWARD";
 
 WidgetLCD lcd(3);
-
-int ledbit;
 
 SO2002A_I2C oled(0x3D);
 
@@ -78,11 +75,11 @@ void setup() {
   preferences.begin("my-app", false);
   volumeValue = preferences.getInt("value", 255);
   preferences.end();
-  
+
   if (volumeCounter != volumeValue ) {
     preferences.putInt("value", volumeCounter);
+    preferences.end();
   }
-  preferences.end();
 
   volumeCounter = volumeValue;
   //
@@ -122,33 +119,22 @@ void loop() {
     portEXIT_CRITICAL(&timerMux);
     inputSelection();
   }
-   preferences.begin("my-app", false);
-   if (volumeCounter != volumeValue ) {
+  
+  preferences.begin("my-app", false);
+  if (volumeCounter != volumeValue ) {
     preferences.putInt("value", volumeCounter);
-//    preferences.end();
+    preferences.end();
   }
-  preferences.end();
   
   messageOut();
   blynkDisplayOut();
-  changeFilter();
+//  changeFilter();
   changePlayMode();
   
   delay(10);
 }
 
 BLYNK_WRITE(V0){
-//  int vm = param[0].asInt();
-//  unsigned char volume;
-//  
-//  if ((vm < 1023) or (vm > 895)) {
-//    volume = vm>>2;
-//  } else if ( (vm < 894) or ( vm > 0)) {
-//    volume = vm;
-//  }
-//  volume = ~volume;
-//  volumeCounter = volume;
-  
   volumeCounter = param[0].asInt();
   unsigned char volume = volumeCounter;
   volume = ~volume;
@@ -268,6 +254,10 @@ BLYNK_WRITE(V2){
 
 BLYNK_WRITE(V4){
   blynkModeButton = param[0].asInt();
+}
+
+BLYNK_WRITE(V6){
+  blynkMuteButton = param[0].asInt();
 }
 
 byte i2cRead(byte sladr, byte regadr){

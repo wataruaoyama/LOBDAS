@@ -8,10 +8,8 @@
 #define pwLED 25
 #define DP 5
 
-int presenceBoard;
-
 Preferences preferences;
-  int volumeValue; 
+int volumeValue; 
 
 int volumeCounter;
 int state;
@@ -20,6 +18,7 @@ volatile int count = 1;
 volatile int buttonState = HIGH;
 volatile int inswState = HIGH;
 volatile int blynkModeButton;
+volatile int blynkMuteButton;
 
 char Sharp[]            = "Sharp            ";
 char Slow[]             = "Slow             ";

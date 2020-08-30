@@ -1,3 +1,4 @@
+/* */
  void changeFilter() {
   bool state = digitalRead(filterSwitch);
 

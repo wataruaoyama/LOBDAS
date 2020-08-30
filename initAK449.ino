@@ -105,6 +105,10 @@ void initAK449() {
   bitWrite(ak449Chip0.Dsd1, 7, 1);    // DDM
   bitWrite(ak449Chip1.Dsd1, 7, 1);
 
+  //DDMT
+  bitWrite(ak449Chip0.Dsd1, 2, 0);
+  bitWrite(ak449Chip1.Dsd1, 2, 0);
+
   // DSD Data streem select
   // DSDSEL[1]
   b = bitRead(cpld.deviceConfig1, 3);
@@ -146,8 +150,8 @@ void initAK449() {
   bitWrite(ak449Chip1.Ctrl6, 2, 1);
   
   // ADPE
-  ak449Chip0.Ctrl8 = 0x00;
-  ak449Chip1.Ctrl8 = 0x00;
+  ak449Chip0.Ctrl8 = 0xE0;
+  ak449Chip1.Ctrl8 = 0xE0;
 
   // Volume
   
