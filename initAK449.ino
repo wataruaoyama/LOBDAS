@@ -106,8 +106,8 @@ void initAK449() {
   bitWrite(ak449Chip1.Dsd1, 7, 1);
 
   //DDMT
-  bitWrite(ak449Chip0.Dsd1, 2, 0);
-  bitWrite(ak449Chip1.Dsd1, 2, 0);
+  bitWrite(ak449Chip0.Dsd1, 2, 1);
+  bitWrite(ak449Chip1.Dsd1, 2, 1);
 
   // DSD Data streem select
   // DSDSEL[1]
