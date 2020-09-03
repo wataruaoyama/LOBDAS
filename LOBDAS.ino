@@ -98,6 +98,7 @@ void loop() {
   Blynk.run();
   
   // put your main code here, to run repeatedly:
+  
   // Timer interrupt process
   if (timeCounter1 > 0) {
     portENTER_CRITICAL(&timerMux);

@@ -1,3 +1,10 @@
+/*************************************************************
+  メッセージ出力
+  ************
+  
+  20x2 OLED表示装置にメッセージを出力する．
+  
+ *************************************************************/
 void messageOut() {
   cpld.sampleRate = i2cRead(CPLD_ADR, 0x03);
   DSDON = cpld.sampleRate & 0x01;
@@ -190,11 +197,11 @@ void displayInputInterface() {
     oled.print("[R]");
   }
   // カウント値が'3'の場合
-  else if ( count == 3 ) {
+  else if (( count == 3 ) || (count == 0)){
     // XHコネクタ(I2Sインターフェース)の選択を表示
     oled.print("[X]");
   }
   else {
-    oled.print("[X]");
+    oled.print("[U]");
   }
 }

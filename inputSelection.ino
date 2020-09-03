@@ -1,65 +1,44 @@
 /*************************************************************
   入力ソースの選択
+  **************
   
   タクトスイッチが押されることによって入力インターフェースを切り替える．
-  スイッチが押される毎に
+  タイマー割り込みで呼ばれ、スイッチが押される毎に
   
     USB -> RJ45 -> XH
   
-  と切り替わる.
+  と切り替わる.スイッチの切り替えはスイッチがOFFの状態からONの状態に変化が
+  あった場合に実行される．
+  
   電源オン時、ESP32のリセット時はUSBとなる.
  *************************************************************/
- 
 void inputSelection() {
   bool state = digitalRead(inputSwitch);
-
+  // スイッチが押されたことの変化があった場合
   if ( inswState == HIGH && state == LOW) {
+    // countに1を足して
     count++;
+    // countが1の場合
     if ( count == 1 ) {
-//      bitWrite(ak449Chip0.Ctrl2, 0, 1);
-//      bitWrite(ak449Chip1.Ctrl2, 0, 1); 
-//      i2cWrite(AK449_Chip0, 0x01, ak449Chip0.Ctrl2);  // Soft mute ON
-      if ( mono == 0x80 ) {
-//        i2cWrite(AK449_Chip1, 0x01, ak449Chip1.Ctrl2);  // Soft mute ON
-      }
-      i2cWrite(CPLD_ADR, 0x00, 0x00);     // Change Input to USB
-//      bitWrite(ak449Chip0.Ctrl2, 0, 0);
-//      bitWrite(ak449Chip1.Ctrl2, 0, 0);       
-//      i2cWrite(AK449_Chip0, 0x01, ak449Chip0.Ctrl2);  // Soft mute OFF
-      if ( mono == 0x80 ) {
-//        i2cWrite(AK449_Chip1, 0x01, ak449Chip1.Ctrl2);  // Soft mute OFF
-      }
+      // 入力をUSBにする
+      i2cWrite(CPLD_ADR, 0x00, 0x00);
+      // シリアルモニタに出力
       Serial.println("USB INPUT Selected");
-    } else if (count == 2) {
-//      bitWrite(ak449Chip0.Ctrl2, 0, 1); 
-//      bitWrite(ak449Chip1.Ctrl2, 0, 1); 
-//      i2cWrite(AK449_Chip0, 0x01, ak449Chip0.Ctrl2);  // Soft mute ON
-      if ( mono == 0x80 ) {
-//        i2cWrite(AK449_Chip1, 0x01, ak449Chip1.Ctrl2);  // Soft mute ON
-      }
-      i2cWrite(CPLD_ADR, 0x00, 0x08);      // Change Inut to RJ45
-//      bitWrite(ak449Chip0.Ctrl2, 0, 0); 
-//      bitWrite(ak449Chip1.Ctrl2, 0, 0); 
-//      i2cWrite(AK449_Chip0, 0x01, ak449Chip0.Ctrl2);  // Soft mute OFF
-      if ( mono == 0x80 ) {
-//        i2cWrite(AK449_Chip1, 0x01, ak449Chip1.Ctrl2);  // Soft mute OFF
-      }
+    }
+    // countが2の場合
+    else if (count == 2) {
+      // 入力をRJ45コネクタ（LANケーブル経由のI2S)にする
+      i2cWrite(CPLD_ADR, 0x00, 0x08);
+      // シリアルモニタに出力
       Serial.println("RJ45 INPUT Seleted");
-    } else if (count == 3) {
-//      bitWrite(ak449Chip0.Ctrl2, 0, 1); 
-//      bitWrite(ak449Chip1.Ctrl2, 0, 1); 
-//      i2cWrite(AK449_Chip0, 0x01, ak449Chip0.Ctrl2);  // Soft mute ON
-      if ( mono == 0x80 ) {
-//        i2cWrite(AK449_Chip1, 0x01, ak449Chip1.Ctrl2);  // Soft mute ON
-      }
-      i2cWrite(CPLD_ADR, 0x00, 0x10);      // Change Inut to XH Connector
-//      bitWrite(ak449Chip0.Ctrl2, 0, 0); 
-//      bitWrite(ak449Chip1.Ctrl2, 0, 0); 
-//      i2cWrite(AK449_Chip0, 0x01, ak449Chip0.Ctrl2);  // Soft mute OFF
-      if ( mono == 0x80 ) {
-//        i2cWrite(AK449_Chip1, 0x01, ak449Chip1.Ctrl2);  // Soft mute OFF
-      }
+    }
+    // countが3の場合
+    else if (count == 3) {
+      // 入力をXHコネクタ(I2S)にする
+      i2cWrite(CPLD_ADR, 0x00, 0x10);
+      // countを0にする
       count = 0;
+      // シリアルモニタに出力
       Serial.println("XH INPUT Selected");
     }
   }

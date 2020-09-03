@@ -1,3 +1,27 @@
+/*************************************************************
+  AK449xの初期化
+  *************
+  
+  レジスタマップをメンバーとする構造体変数の初期化.
+  デバイスに設定値を書き込みのはinitRegisterで行う．
+
+  設定用のヘッダーピンの状態を読み、それに応じてレジスタの設定を行う．
+  ヘッダーピンの設定状態はCPLDのレジスタ00H-02Hに割り当てられる．
+
+               D7   D6    D5   D4   D3     D2       D1       D0
+      +-------+----+----+----+----+----+--------+--------+--------+
+  00H |HWCONF |OPT1|OPT2| -- | -- | -- |devName2|devName1|devMame0|
+      +-------+----+----+----|----|----|--------|--------|--------|
+               　D7    D6    D5   D4   D3   D2     D1   D0
+      +-------+-----+-----+----+----+----+-------+----+----+
+  01H |DVCONF0|MONO1|MONO0|DIF2|DIF1|DIF0|DSDPATH|GC1 |GC0 |
+      +-------+-----+-----+----+----+----+-------+----+----+
+                D7   D6   D5   D4    D3      D2     D1   D0
+      +-------+----+----+----+----+-------+-------+----+----+
+  02H |DVCONF1|CHLR| -- | -- |DEMP|DSDSEL1|DSDSEL0|DSDD|DSDF|
+      +-------+----+----+----+----+-------+-------+----+----+ 
+      
+ *************************************************************/
 void initAK449() {
   int regData;
   int b;
@@ -10,37 +34,53 @@ void initAK449() {
   deviceName = cpld.hwConfig & 0x07;
   DIF = cpld.deviceConfig0 & 0x38;
 
-  // Audio Data Interface modes
-  // Default is 32bit I2S intercace
-  if (DIF == 0x38) {      // DIF=0x0E
+  /* Audio Data Interface modesの設定 */
+  /* デフォルトは32bit I2S intercace */
+  // DIF[2:0]=(111)
+  if (DIF == 0x38) {
+    // 32-bit I2S
     ak449Chip0.Ctrl1 = 0x8F; 
     ak449Chip1.Ctrl1 = 0x8F;    
   }
-  else if (DIF == 0x30) { // DIF=0x0C  
+  // DIF[2:0]=(110)
+  else if (DIF == 0x30) {
+    // 32-bit 左詰め
     ak449Chip0.Ctrl1 = 0x8D; 
     ak449Chip1.Ctrl1 = 0x8D;   
   }
-  else if (DIF == 0x28) { // DIF=0x0A
+  // DIF[2:0]=(101)
+  else if (DIF == 0x28) {
+    // 32-bit 右詰め
     ak449Chip0.Ctrl1 = 0x8B; 
     ak449Chip1.Ctrl1 = 0x88;   
   }
-  else if (DIF == 0x20) {  // DIF=0x08
+  // DIF[2:0]=(100)
+  else if (DIF == 0x20) {
+    // 24-bit 右詰め
     ak449Chip0.Ctrl1 = 0x89; 
     ak449Chip1.Ctrl1 = 0x89;    
   }
-  else if (DIF == 0x18) { // DIF= 0x06
+  // DIF[2:0]=(011)
+  else if (DIF == 0x18) {
+    // 24-bit I2S/16-bit I2S
     ak449Chip0.Ctrl1 = 0x87; 
     ak449Chip1.Ctrl1 = 0x87;    
   }
-  else if (DIF == 0x10) { // DIF=0x04
+  // DIF[2:0]=(010)
+  else if (DIF == 0x10) {
+    // 24-bit 左詰め
     ak449Chip0.Ctrl1 = 0x85; 
     ak449Chip1.Ctrl1 = 0x85;    
   }
-  else if (DIF == 0x08) { // DIF=0x02
+  // DIF[2:0]=(001)
+  else if (DIF == 0x08) {
+    // 20-bit 右詰め
     ak449Chip0.Ctrl1 = 0x83; 
     ak449Chip1.Ctrl1 = 0x83;    
   }
-  else if (DIF == 0x00) { // DIF=0x00
+  // DIF[2:0]=(000)
+  else if (DIF == 0x00) {
+    // 16-bit 右詰め
     ak449Chip0.Ctrl1 = 0x81; 
     ak449Chip1.Ctrl1 = 0x81;    
   }
@@ -109,12 +149,12 @@ void initAK449() {
   bitWrite(ak449Chip0.Dsd1, 2, 1);
   bitWrite(ak449Chip1.Dsd1, 2, 1);
 
-  // DSD Data streem select
-  // DSDSEL[1]
+  // DSDSEL[1:0]: DSDデータストリームレートの選択
+  // DSDSEL1
   b = bitRead(cpld.deviceConfig1, 3);
   bitWrite(ak449Chip0.Dsd2, 0, b);
   bitWrite(ak449Chip1.Dsd2, 0, b);
-  // DSDSEL[0]
+  // DSDSEL0
   b = bitRead(cpld.deviceConfig1, 2);
   bitWrite(ak449Chip0.Dsd1, 0, b);
   bitWrite(ak449Chip1.Dsd1, 0, b);
@@ -124,17 +164,15 @@ void initAK449() {
   bitWrite(ak449Chip0.Dsd1, 1, DSDD);
   bitWrite(ak449Chip1.Dsd1, 1, DSDD);
 
-  // Gain Control
-  // GC[1]
+  // GC[1:0]: Gain Control
   GC1 = bitRead(cpld.deviceConfig0, 1);
   bitWrite(ak449Chip0.Ctrl5, 2, GC1);
   bitWrite(ak449Chip1.Ctrl5, 2, GC1);
-  // GC[0]
   GC0 = bitRead(cpld.deviceConfig0, 0);
   bitWrite(ak449Chip0.Ctrl5, 1, GC0);
   bitWrite(ak449Chip1.Ctrl5, 1, GC0);
 
-  // SYNCE
+  // SYNCE: クロックの同期化機能を有効）
   bitWrite(ak449Chip0.Ctrl5, 0, 1);
   bitWrite(ak449Chip1.Ctrl5, 0, 1);
  
@@ -149,8 +187,9 @@ void initAK449() {
   bitWrite(ak449Chip1.Ctrl6, 3, 1);
   bitWrite(ak449Chip1.Ctrl6, 2, 1);
   
-  // ADPE
-  ak449Chip0.Ctrl8 = 0xE0;
+  // ADPE: PCM/DSD再生モード自動切り替え
+  // ADPT[1:0]: 切替時のモード判定を開始するまでの時間設定
+  ak449Chip0.Ctrl8 = 0xE0;  // 自動切り替えを有効にし、判定までの時間は1024/fs+18/fs
   ak449Chip1.Ctrl8 = 0xE0;
 
   // Volume
