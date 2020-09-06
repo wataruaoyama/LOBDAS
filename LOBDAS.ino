@@ -1,3 +1,16 @@
+/*************************************************************
+  LOBDAS(LOgic Board for Digital Audio System
+  ********************************************
+  
+  ロジック基板説明書:
+   http://linuxcom.info/netshop/LOBDAS_manual.pdf
+
+  LOBDASはAKMのプレミアムDAC AK449xシリーズと組み合わせてデジタル
+  オーディオシステムを構成する．
+
+  スマホとの無線接続（BLE、WiFi）を容易にするためにBlynkアプリに対応する．
+  
+ *************************************************************/
 #include <BLEDevice.h>
 #include <BLEUtils.h>
 #include <BLEScan.h>
@@ -27,10 +40,12 @@ char auth[] = "Your Auth Token";
 // Your WiFi credentials.
 // Set password to "" for open networks.
 //char ssid[] = "SSID;
-//char pass[] = "PASSWARD";
+//char pass[] = "PASSWORD";
 
+//BlynkのLCDウィジェット
 WidgetLCD lcd(3);
 
+// SO2002Aのスレーブアドレスを0x3Dに指定
 SO2002A_I2C oled(0x3D);
 
 void setup() {
@@ -43,8 +58,6 @@ void setup() {
   pinMode(inputSwitch,INPUT);
   pinMode(pwLED, OUTPUT);
   pinMode(DP, INPUT);
-  
-  attachInterrupt(DP, playMode, CHANGE);
   
   // Setup timer interrupt
   // Timer: interrupt time and event setting. 
@@ -85,12 +98,15 @@ void setup() {
   //
   Serial.begin(115200);
   Wire.begin(SDA, SCL);
+  // SCLの周波数を400kHzに設定する
   Wire.setClock(400000);
-  delay(1000);  // Wait 1 second for reset CPLD
+  // Wait 1 second for reset CPLD
+  delay(1000);  
   initRegister();
   initDisplay();
 //  Blynk.begin(auth, ssid, pass);
   Blynk.begin(auth);
+  // デバッグ用のLEDを点灯
   digitalWrite(pwLED,HIGH);
 }
 
@@ -129,12 +145,13 @@ void loop() {
   
   messageOut();
   blynkDisplayOut();
-//  changeFilter();
   changePlayMode();
   
   delay(10);
 }
 
+/* Blynk virtual pin 0 function. */
+// Blynkのスライダーの値をvolumeCounterに
 BLYNK_WRITE(V0){
   volumeCounter = param[0].asInt();
   unsigned char volume = volumeCounter;
@@ -142,6 +159,7 @@ BLYNK_WRITE(V0){
   volumeCounter = volume;
 }
 
+/* Blynk veirtual pin 1 function */
 BLYNK_WRITE(V1){
   int blynkButton = param[0].asInt();
   if ( blynkButton == 1) {
@@ -199,6 +217,7 @@ BLYNK_WRITE(V1){
   }
 }
 
+/* Blynk virtual pin 2 function */
 BLYNK_WRITE(V2){
   int blynkInsel = param.asInt();
     if ( blynkInsel == 1) {
@@ -253,10 +272,12 @@ BLYNK_WRITE(V2){
   }
 }
 
+/* Blynk virtual pin 4 function */
 BLYNK_WRITE(V4){
   blynkModeButton = param[0].asInt();
 }
 
+/* Blynk virtual pin 6 function */
 BLYNK_WRITE(V6){
   blynkMuteButton = param[0].asInt();
 }

@@ -1,3 +1,10 @@
+/*************************************************************
+  レジスタの初期化
+  ***************
+  
+  CPLDとAK449xの内部レジスタを初期化する．
+  
+ *************************************************************/
 void initRegister() {
 
 //  ak449Chip0.Ctrl1 = 0x8F;            // 0x00
@@ -26,7 +33,13 @@ void initRegister() {
   i2cWrite(CPLD_ADR, 0x00, 0x00);
   initAK449();
   
-  i2cWrite(AK449_Chip0, 0x15, ak449Chip0.Ctrl8);    
+  if ((deviceName == 0x07) or (deviceName == 0x06)) {
+    i2cWrite(AK449_Chip0, 0x15, ak449Chip0.Ctrl8);
+    if ( mono == 0x80 ) {
+      i2cWrite(AK449_Chip1, 0x15, ak449Chip0.Ctrl8);
+    }
+  }
+  
   Wire.beginTransmission(AK449_Chip0);
   Wire.write(0x00);
   Wire.write(ak449Chip0.Ctrl1);
@@ -48,7 +61,6 @@ void initRegister() {
   Wire.endTransmission();
 
   if ( mono == 0x80 ) {
-    i2cWrite(AK449_Chip1, 0x15, ak449Chip1.Ctrl8);   
     Wire.beginTransmission(AK449_Chip1);
     Wire.write(0x00);
     Wire.write(ak449Chip1.Ctrl1);
