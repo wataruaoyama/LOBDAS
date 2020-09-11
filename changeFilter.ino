@@ -38,6 +38,7 @@ void changeFilter() {
       bitWrite(ak449Chip0.Ctrl3, 0, 0); // SLOWビット
       bitWrite(ak449Chip0.Ctrl2, 5, 0); // SDビット
       bitWrite(ak449Chip0.Ctrl4, 0, 0); // SSLOWビット
+      // デュアルモノモード
       if ( mono == 0x80) {
         bitWrite(ak449Chip1.Ctrl3, 0, 0);
         bitWrite(ak449Chip1.Ctrl2, 5, 0);
@@ -94,8 +95,11 @@ void changeFilter() {
   }
   buttonState = state;
   // 設定内容をDACに書き込む
+  // SLOWビット
   i2cWrite(AK449_Chip0, 0x01, ak449Chip0.Ctrl2);
+  // SDビット
   i2cWrite(AK449_Chip0, 0x02, ak449Chip0.Ctrl3);
+  // SSLOWビット
   i2cWrite(AK449_Chip0, 0x05, ak449Chip0.Ctrl4);
   if ( mono == 0x80 ) {
     i2cWrite(AK449_Chip1, 0x01, ak449Chip1.Ctrl2);

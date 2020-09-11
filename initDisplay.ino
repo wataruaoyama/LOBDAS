@@ -11,7 +11,7 @@
   
  *************************************************************/
 void initDisplay() {
-  
+
   oled.begin(20, 2);
   oled.clear();
   oled.setCursor(0,0);
@@ -195,4 +195,15 @@ void initDisplay() {
   }
   delay(3000);
   oled.clear();
+  
+  /* SSD1306 OLEDディスプレイに表示 */
+  display.setTextSize(2);
+  display.setTextColor(SSD1306_WHITE);
+  display.setCursor(0, 0);
+  display.println(F("Hello,"));
+  display.setCursor(0, 20);
+  display.println(F("I am"));
+  display.setCursor(0,40);
+  display.println(F("LOBDAS."));
+  display.display();
 }

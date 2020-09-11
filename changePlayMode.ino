@@ -14,7 +14,7 @@ void changePlayMode(){
   int DSD = digitalRead(DP);
   int DSDSEL = cpld.deviceConfig1 & 0x0C;
 
-  /*  */
+  /* スマホからのソフトミュート操作 */
   if (blynkMuteButton == 1) {
     bitWrite(ak449Chip0.Ctrl2, 0, 1); 
     i2cWrite(AK449_Chip0, 0x01, ak449Chip0.Ctrl2);  // Soft mute ON

@@ -1,9 +1,18 @@
+/*************************************************************
+  スマホ側のLCD表示
+  ***************
+  
+  20x2のOLEDに表示させている内容をそのままLCD Widgetに表示させている．
+  基本的にoled.printをlcd.printに置き換えているが、20桁から16桁に
+  なっているので表示位置等、多少変更した．
+ *************************************************************/
 void blynkDisplayOut() {
   cpld.sampleRate = i2cRead(CPLD_ADR, 0x03);
   DSDON = cpld.sampleRate & 0x01;
   FS = cpld.sampleRate & 0x3C;
   DSD64 = cpld.sampleRate & 0x42;
-
+  
+  /* LCDの表示モードの切り替え */
   if (blynkModeButton == 0) {
     blynkDisplayPlayMode();
     blynkDisplayFs();
@@ -14,8 +23,7 @@ void blynkDisplayOut() {
   }
 }
 
-void blynkDisplayPlayMode() {
-  
+void blynkDisplayPlayMode() { 
   if ( DSDON == 0x01) {
     lcd.print(0, 0, "DSD");
   } else if ( DSDON == 0x00 ){
@@ -143,10 +151,10 @@ void blynkDisplayInputInterface() {
   else if ( count == 2 ) {  // RJ45
     lcd.print(6, 1, "RJ45      ");
   }
-  else if ( count == 3 ) {  // XH Connector
+  else if (( count == 3 )  || ( count == 0 )) {  // XH Connector
     lcd.print(6, 1, "XH        ");
   }
   else {
-    lcd.print(6, 1, "XH        ");
+    lcd.print(6, 1, "USB       ");
   }
 }

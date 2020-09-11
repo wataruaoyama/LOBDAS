@@ -19,15 +19,20 @@
 
 #include <Wire.h>
 #include "SO2002A_I2C.h"
+#include <Adafruit_GFX.h>
+#include <Adafruit_SSD1306.h>
+
 #include <Preferences.h>
 #include "ak449.h"
 
 #define SDA 21
 #define SCL 22
 
+// 126x64pixel SSD1306 OLED
+Adafruit_SSD1306 display(128, 64, &Wire, -1);
+
 /* Comment this out to disable prints and save space */
 #define BLYNK_PRINT Serial
-
 
 //#include <WiFi.h>
 //#include <WiFiClient.h>
@@ -42,10 +47,10 @@ char auth[] = "Your Auth Token";
 //char ssid[] = "SSID;
 //char pass[] = "PASSWORD";
 
-//BlynkのLCDウィジェット
+//BlynkのLCDのバーチャルピンは 3 
 WidgetLCD lcd(3);
 
-// SO2002Aのスレーブアドレスを0x3Dに指定
+// SO2002Aのスレーブアドレスは0x3D
 SO2002A_I2C oled(0x3D);
 
 void setup() {
@@ -58,7 +63,12 @@ void setup() {
   pinMode(inputSwitch,INPUT);
   pinMode(pwLED, OUTPUT);
   pinMode(DP, INPUT);
-  
+
+  // SSD1306のスレーブアドレスは0x3C
+  display.begin(SSD1306_SWITCHCAPVCC, 0x3C);
+  // Adafuitのロゴ表示データを消去
+  display.clearDisplay();
+
   // Setup timer interrupt
   // Timer: interrupt time and event setting. 
   timer1 = timerBegin(0, 80, true);
@@ -101,7 +111,7 @@ void setup() {
   // SCLの周波数を400kHzに設定する
   Wire.setClock(400000);
   // Wait 1 second for reset CPLD
-  delay(1000);  
+  delay(1000);
   initRegister();
   initDisplay();
 //  Blynk.begin(auth, ssid, pass);
@@ -151,7 +161,7 @@ void loop() {
 }
 
 /* Blynk virtual pin 0 function. */
-// Blynkのスライダーの値をvolumeCounterに
+// Blynkのスライダーの値をATTレベルにする
 BLYNK_WRITE(V0){
   volumeCounter = param[0].asInt();
   unsigned char volume = volumeCounter;
@@ -160,6 +170,7 @@ BLYNK_WRITE(V0){
 }
 
 /* Blynk veirtual pin 1 function */
+// デジタルフィルタ特性の切り替え
 BLYNK_WRITE(V1){
   int blynkButton = param[0].asInt();
   if ( blynkButton == 1) {
@@ -218,54 +229,18 @@ BLYNK_WRITE(V1){
 }
 
 /* Blynk virtual pin 2 function */
+// 入力ソースの切り替え
 BLYNK_WRITE(V2){
   int blynkInsel = param.asInt();
     if ( blynkInsel == 1) {
     count++;
-    if ( count == 1 ) {
-      bitWrite(ak449Chip0.Ctrl2, 0, 1);
-      bitWrite(ak449Chip1.Ctrl2, 0, 1); 
-      i2cWrite(AK449_Chip0, 0x01, ak449Chip0.Ctrl2);  // Soft mute ON
-      if ( mono == 0x80 ) {
-        i2cWrite(AK449_Chip1, 0x01, ak449Chip1.Ctrl2);  // Soft mute ON
-      }      
+    if ( count == 1 ) {      
       i2cWrite(CPLD_ADR, 0x00, 0x00);     // Change Input to USB
-      bitWrite(ak449Chip0.Ctrl2, 0, 0);
-      bitWrite(ak449Chip1.Ctrl2, 0, 0);       
-      i2cWrite(AK449_Chip0, 0x01, ak449Chip0.Ctrl2);  // Soft mute OFF
-      if ( mono == 0x80 ) {
-        i2cWrite(AK449_Chip1, 0x01, ak449Chip1.Ctrl2);  // Soft mute OFF
-      }
       Serial.println("USB INPUT Selected");
     } else if (count == 2) {
-      bitWrite(ak449Chip0.Ctrl2, 0, 1); 
-      bitWrite(ak449Chip1.Ctrl2, 0, 1); 
-      i2cWrite(AK449_Chip0, 0x01, ak449Chip0.Ctrl2);  // Soft mute ON
-      if ( mono == 0x80 ) {
-        i2cWrite(AK449_Chip1, 0x01, ak449Chip1.Ctrl2);  // Soft mute ON
-      }
       i2cWrite(CPLD_ADR, 0x00, 0x08);      // Change Inut to RJ45
-      bitWrite(ak449Chip0.Ctrl2, 0, 0); 
-      bitWrite(ak449Chip1.Ctrl2, 0, 0); 
-      i2cWrite(AK449_Chip0, 0x01, ak449Chip0.Ctrl2);  // Soft mute OFF
-      if ( mono == 0x80 ) {
-        i2cWrite(AK449_Chip1, 0x01, ak449Chip1.Ctrl2);  // Soft mute OFF
-      }
       Serial.println("RJ45 INPUT Seleted");
     } else if (count == 3) {
-      bitWrite(ak449Chip0.Ctrl2, 0, 1); 
-      bitWrite(ak449Chip1.Ctrl2, 0, 1); 
-      i2cWrite(AK449_Chip0, 0x01, ak449Chip0.Ctrl2);  // Soft mute ON
-      if ( mono == 0x80 ) {
-        i2cWrite(AK449_Chip1, 0x01, ak449Chip1.Ctrl2);  // Soft mute ON
-      }
-      i2cWrite(CPLD_ADR, 0x00, 0x10);      // Change Inut to RJ45
-      bitWrite(ak449Chip0.Ctrl2, 0, 0); 
-      bitWrite(ak449Chip1.Ctrl2, 0, 0); 
-      i2cWrite(AK449_Chip0, 0x01, ak449Chip0.Ctrl2);  // Soft mute OFF
-      if ( mono == 0x80 ) {
-        i2cWrite(AK449_Chip1, 0x01, ak449Chip1.Ctrl2);  // Soft mute OFF
-      }
       count = 0;
       Serial.println("XH INPUT Selected");
     }
@@ -273,6 +248,7 @@ BLYNK_WRITE(V2){
 }
 
 /* Blynk virtual pin 4 function */
+// スマホのLCDの表示モードの切り替え
 BLYNK_WRITE(V4){
   blynkModeButton = param[0].asInt();
 }
