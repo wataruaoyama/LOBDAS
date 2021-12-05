@@ -25,6 +25,8 @@
 #include <Preferences.h>
 #include "ak449.h"
 
+//#define BLYNK
+
 #define SDA 21
 #define SCL 22
 
@@ -34,18 +36,9 @@ Adafruit_SSD1306 display(128, 64, &Wire, -1);
 /* Comment this out to disable prints and save space */
 #define BLYNK_PRINT Serial
 
-//#include <WiFi.h>
-//#include <WiFiClient.h>
-//#include <BlynkSimpleEsp32.h>
-
 // You should get Auth Token in the Blynk App.
 // Go to the Project Settings (nut icon).
 char auth[] = "Your Auth Token";
-
-// Your WiFi credentials.
-// Set password to "" for open networks.
-//char ssid[] = "SSID;
-//char pass[] = "PASSWORD";
 
 //BlynkのLCDのバーチャルピンは 3 
 WidgetLCD lcd(3);
@@ -68,6 +61,7 @@ void setup() {
   display.begin(SSD1306_SWITCHCAPVCC, 0x3C);
   // Adafuitのロゴ表示データを消去
   display.clearDisplay();
+  display.display();
 
   // Setup timer interrupt
   // Timer: interrupt time and event setting. 
@@ -114,16 +108,20 @@ void setup() {
   delay(1000);
   initRegister();
   initDisplay();
-//  Blynk.begin(auth, ssid, pass);
-  Blynk.begin(auth);
+  
+  #ifdef BLYNK
+    Blynk.begin(auth);
+  #endif
+  
   // デバッグ用のLEDを点灯
   digitalWrite(pwLED,HIGH);
 }
 
 void loop() {
-  Blynk.run();
-  
   // put your main code here, to run repeatedly:
+  #ifdef BLYNK
+    Blynk.run();
+  #endif
   
   // Timer interrupt process
   if (timeCounter1 > 0) {
